@@ -4,6 +4,7 @@ import { db } from "../lib/databases";
 import { RawNote } from "../utils/types";
 import ErrorCard from "../component/ErrorCard";
 import Loading from "../component/Loading";
+import Controls from "../component/Controls";
 
 const NotesPage = () => {
   const {
@@ -28,9 +29,14 @@ const NotesPage = () => {
   }
 
   return (
-    <div className="relative">
-      {notes?.documents.map((note) => <NoteCard key={note.$id} note={note} />)}
-    </div>
+    <>
+      <div className="relative">
+        {notes?.documents.map((note) => (
+          <NoteCard key={note.$id} note={note} />
+        ))}
+      </div>
+      <Controls />
+    </>
   );
 };
 

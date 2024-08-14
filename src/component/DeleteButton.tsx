@@ -3,6 +3,7 @@ import { Trash } from "lucide-react";
 import { RawNote } from "../utils/types";
 import type { Models } from "appwrite";
 import { db } from "../lib/databases";
+import { shallowUpdateUrlAndNotify } from "../hooks/useUrlChange";
 
 type Props = {
   id: string;
@@ -24,6 +25,8 @@ const DeleteButton = ({ id }: Props) => {
         documents: updatedNotes,
         total: updatedNotes.length,
       });
+
+      shallowUpdateUrlAndNotify("/");
 
       // Option 2
       // client.invalidateQueries({ queryKey: ["notes"], exact: true });

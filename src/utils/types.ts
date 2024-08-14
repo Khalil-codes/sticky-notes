@@ -19,3 +19,10 @@ export interface Note {
     y: number;
   };
 }
+
+export interface Color {
+  id: string;
+  colorHeader: string;
+  colorBody: string;
+  colorText: string;
+}
