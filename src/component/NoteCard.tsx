@@ -43,13 +43,18 @@ const NoteCard: FC<Props> = ({ note, shouldDisabledDrag = false }) => {
   );
   const { colorHeader, colorBody, colorText } = JSON.parse(note.colors);
 
-  const onStop = (_: DraggableEvent, position: DraggableData) => {
-    setPosition({ x: position.x, y: position.y });
-    mutate({
-      id: note.$id,
-      key: "position",
-      value: { x: position.x, y: position.y },
-    });
+  const onStop = (_: DraggableEvent, _position: DraggableData) => {
+    const hasCardMoved =
+      position.x !== _position.x || position.y !== _position.y;
+
+    if (hasCardMoved) {
+      setPosition({ x: _position.x, y: _position.y });
+      mutate({
+        id: note.$id,
+        key: "position",
+        value: { x: _position.x, y: _position.y },
+      });
+    }
   };
 
   useEffect(() => {
