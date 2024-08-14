@@ -3,14 +3,14 @@ import { Note, RawNote } from "../utils/types";
 import { RefreshCcw } from "lucide-react";
 import Draggable, { DraggableData, DraggableEvent } from "react-draggable";
 import { bodyParser, setZIndex } from "../utils/helpers";
+import { useMutation } from "@tanstack/react-query";
+import { db } from "../lib/databases";
 import DeleteButton from "./DeleteButton";
 
 interface Props {
   note: RawNote;
   shouldDisabledDrag?: boolean;
 }
-
-const isPending = false;
 
 const autoGrow = (ref: MutableRefObject<HTMLTextAreaElement | null>) => {
   const { current } = ref;
@@ -23,6 +23,18 @@ const autoGrow = (ref: MutableRefObject<HTMLTextAreaElement | null>) => {
 const NoteCard: FC<Props> = ({ note, shouldDisabledDrag = false }) => {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
+  const { isPending, mutate } = useMutation({
+    mutationKey: ["notes", { id: note.$id }],
+    mutationFn: async (variables: {
+      id: string;
+      key: keyof Note;
+      value: unknown;
+    }) => {
+      const { id, key, value } = variables;
+      const payload = { [key]: JSON.stringify(value) };
+      await db.notes.update(id, payload);
+    },
+  });
 
   const body = bodyParser(note.body);
 
@@ -33,6 +45,11 @@ const NoteCard: FC<Props> = ({ note, shouldDisabledDrag = false }) => {
 
   const onStop = (_: DraggableEvent, position: DraggableData) => {
     setPosition({ x: position.x, y: position.y });
+    mutate({
+      id: note.$id,
+      key: "position",
+      value: { x: position.x, y: position.y },
+    });
   };
 
   useEffect(() => {
@@ -90,8 +107,11 @@ const NoteCard: FC<Props> = ({ note, shouldDisabledDrag = false }) => {
                 textAreaRef.current &&
                 note.body !== textAreaRef.current.value
               ) {
-                console.log("Data changed");
-                // perform update here
+                mutate({
+                  id: note.$id,
+                  key: "body",
+                  value: textAreaRef.current.value,
+                });
               }
             }}
             rows={4}
