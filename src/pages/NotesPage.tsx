@@ -1,15 +1,22 @@
-import { fakeData as notes } from "../assets/data";
+import { useQuery } from "@tanstack/react-query";
 import NoteCard from "../component/NoteCard";
+import { db } from "../lib/databases";
+import { RawNote } from "../utils/types";
 import ErrorCard from "../component/ErrorCard";
 import Loading from "../component/Loading";
 
-const isLoading = false;
-// const error = {
-//   message: "Something went wrong",
-// };
-const error = null;
-
 const NotesPage = () => {
+  const {
+    data: notes,
+    error,
+    isLoading,
+  } = useQuery({
+    queryKey: ["notes"],
+    queryFn: async () => {
+      return await db.notes.list<RawNote>();
+    },
+  });
+
   if (error) {
     console.error(error);
     return <ErrorCard error={error.message || "Something went wrong"} />;
@@ -21,7 +28,7 @@ const NotesPage = () => {
 
   return (
     <div className="relative">
-      {notes?.map((note) => <NoteCard key={note.$id} note={note} />)}
+      {notes?.documents.map((note) => <NoteCard key={note.$id} note={note} />)}
     </div>
   );
 };
