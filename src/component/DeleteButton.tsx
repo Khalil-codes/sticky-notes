@@ -13,6 +13,7 @@ const DeleteButton = ({ id }: Props) => {
   const { mutate, isPending } = useMutation({
     mutationKey: ["notes", { id: id }, "delete"],
     onSuccess: () => {
+      // Option 1
       const notes = client.getQueryData<Models.DocumentList<RawNote>>([
         "notes",
       ]);
@@ -23,6 +24,9 @@ const DeleteButton = ({ id }: Props) => {
         documents: updatedNotes,
         total: updatedNotes.length,
       });
+
+      // Option 2
+      // client.invalidateQueries({ queryKey: ["notes"], exact: true });
     },
     mutationFn: async (id: string) => {
       await db.notes.delete(id);

@@ -12,6 +12,7 @@ const NotesPage = () => {
     isLoading,
   } = useQuery({
     queryKey: ["notes"],
+    placeholderData: (previousData) => previousData,
     queryFn: async () => {
       return await db.notes.list<RawNote>();
     },
